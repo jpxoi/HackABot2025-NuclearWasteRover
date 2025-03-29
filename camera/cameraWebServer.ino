@@ -35,7 +35,7 @@
 // ===========================
 // Enter your WiFi credentials
 // ===========================
-const char* ssid = "SpikeyVision-Rover19";
+const char* ssid = "SpikeyVision";
 const char* password = "HOLA123456";
 
 void startCameraServer();
