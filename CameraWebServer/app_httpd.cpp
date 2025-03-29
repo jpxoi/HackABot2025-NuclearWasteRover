@@ -19,6 +19,7 @@
 #include "esp32-hal-ledc.h"
 #include "sdkconfig.h"
 #include "camera_index.h"
+#include "camera_pins.h"
 
 #if defined(ARDUINO_ARCH_ESP32) && defined(CONFIG_ARDUHAL_ESP_LOG)
 #include "esp32-hal-log.h"
@@ -30,12 +31,12 @@
 // LED FLASH setup
 #if CONFIG_LED_ILLUMINATOR_ENABLED
 
-#define LED_LEDC_GPIO            LED_GPIO_NUM  //use LED pin defined in camera_pins.h
 #define CONFIG_LED_MAX_INTENSITY 255
 #define LED_LEDC_CHANNEL         8  // Use channel 8 for LED control
 
 int led_duty = 0;
 bool isStreaming = false;
+int led_gpio = 4;  // Default to GPIO 4 for LED pin
 
 #endif
 
@@ -101,7 +102,7 @@ void enable_led(bool en) {  // Turn LED On or Off
   if (en && isStreaming && (led_duty > CONFIG_LED_MAX_INTENSITY)) {
     duty = CONFIG_LED_MAX_INTENSITY;
   }
-  ledcWrite(LED_LEDC_GPIO, duty);  // Use the pin directly with ledcWrite 
+  ledcWrite(LED_LEDC_CHANNEL, duty);
   log_i("Set LED intensity to %d", duty);
 }
 
@@ -893,7 +894,8 @@ void startCameraServer() {
 
 void setupLedFlash(int pin) {
 #if CONFIG_LED_ILLUMINATOR_ENABLED
-  ledcAttach(pin, 5000, 8); // Use ledcAttach instead of ledcSetup and ledcAttachPin
+  ledcAttach(pin, 5000, LED_LEDC_CHANNEL); // Attach pin to LED_LEDC_CHANNEL
+  led_gpio = pin;  // Store the pin for later use
 #else
   log_i("LED flash is disabled -> CONFIG_LED_ILLUMINATOR_ENABLED = 0");
 #endif
