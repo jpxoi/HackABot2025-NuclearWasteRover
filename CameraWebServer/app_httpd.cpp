@@ -92,13 +92,16 @@ static int ra_filter_run(ra_filter_t *filter, int value) {
 }
 #endif
 
+// Forward declarations
+static esp_err_t parse_get(httpd_req_t *req, char **obuf);
+
 #if CONFIG_LED_ILLUMINATOR_ENABLED
 void enable_led(bool en) {  // Turn LED On or Off
   int duty = en ? led_duty : 0;
   if (en && isStreaming && (led_duty > CONFIG_LED_MAX_INTENSITY)) {
     duty = CONFIG_LED_MAX_INTENSITY;
   }
-  ledcWrite(LED_LEDC_CHANNEL, duty);
+  ledcWrite(LED_LEDC_GPIO, duty);  // Use the pin directly with ledcWrite 
   log_i("Set LED intensity to %d", duty);
 }
 
@@ -890,8 +893,7 @@ void startCameraServer() {
 
 void setupLedFlash(int pin) {
 #if CONFIG_LED_ILLUMINATOR_ENABLED
-  ledcSetup(8, 5000, 8); // Channel 8, 5000Hz, 8-bit resolution
-  ledcAttachPin(pin, 8); // Attach pin to channel 8
+  ledcAttach(pin, 5000, 8); // Use ledcAttach instead of ledcSetup and ledcAttachPin
 #else
   log_i("LED flash is disabled -> CONFIG_LED_ILLUMINATOR_ENABLED = 0");
 #endif
