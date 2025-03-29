@@ -8,16 +8,16 @@ AF_DCMotor motor2(2);
 AF_DCMotor motor3(3);
 AF_DCMotor motor4(4);
 
-Servo servo1;
-Servo servo2;
+Servo servo1; // Camera servo (up/down)
+Servo servo2; // Arm servo (open/close)
 
 const int trigPin = 12;
 const int echoPin = 11;
 
-const int level1 = 10;  // Farther distance
-const int level2 = 5;  // Medium distance
-const int level3 = 3;  // Closer distance
-const int minDistance = 2;  // Very close, continuous beep
+const int level1 = 20;  // Farther distance
+const int level2 = 10;  // Medium distance
+const int level3 = 5;  // Closer distance
+const int minDistance = 3;  // Very close, continuous beep
 
 long duration;
 int distance;
@@ -54,70 +54,47 @@ void loop()
     Serial.println(value);
 
     // Control servos based on received value
-    if (value == '1')
-    {
-      servo1.write(70);
-      servo2.write(180 - 70);
-    }
-    else if (value == '2')
-    {
-      servo1.write(80);
-      servo2.write(180 - 80);
-    }
-    else if (value == '3')
-    {
-      servo1.write(90);
-      servo2.write(180 - 90);
-    }
-    else if (value == '4')
-    {
-      servo1.write(100);
-      servo2.write(180 - 100);
-    }
-    else if (value == '5')
-    {
-      servo1.write(120);
-      servo2.write(180 - 120);
-    }
-    else if (value == '6')
-    {
-      servo1.write(140);
-      servo2.write(180 - 140);
-    }
-    else if (value == '7')
-    {
-      servo1.write(150);
-      servo2.write(180 - 150);
-    }
-    else if (value == '8')
-    {
-      servo1.write(160);
-      servo2.write(180 - 160);
-    }
-    else if (value == '9')
-    {
-      servo1.write(170);
-      servo2.write(180 - 170);
-    }
-    else if (value == 'F')
-    {
-      forward();
-    }
-    else if (value == 'B')
-    {
-      backward();
-    }
-    else if (value == 'L')
-    {
-      left();
-    }
-    else if (value == 'R')
-    {
-      right();
-    }
-    else
-    {
-      Stop();
+    switch(value) {
+      // Camera servo control (up/down movement)
+      case 'U': // Camera Up
+        servo1.write(150);
+        break;
+      case 'D': // Camera Down
+        servo1.write(90);
+        break;
+      case 'C': // Camera Center
+        servo1.write(120);
+        break;
+        
+      // Arm servo control (open/close hand)
+      case 'O': // Open hand
+        servo2.write(180);
+        break;
+      case 'H': // Close hand (half)
+        servo2.write(120);
+        break;
+      case 'G': // Close hand fully (grab)
+        servo2.write(60);
+        break;
+      
+      // Movement controls
+      case 'F':
+        forward();
+        break;
+      case 'B':
+        backward(); 
+        break;
+      case 'L':
+        left();
+        break;
+      case 'R':
+        right();
+        break;
+      
+      // Default case - stop movement
+      default:
+        Stop();
+        break;
     }
   }
   
