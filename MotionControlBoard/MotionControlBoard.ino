@@ -33,12 +33,17 @@ void setup()
   motor4.setSpeed(Speed);
 
   // Attach servos to pins 9 and 10
-  servo1.attach(9);
-  servo2.attach(10);
+  servo1.attach(10);
+  servo2.attach(9);
 
   // Set initial positions of servos
-  servo1.write(70);
-  servo2.write(180 - 70);
+  servo1.write(180);
+  servo2.write(180);
+
+  // Set Ultrasonic Sensor
+  pinMode(trigPin, OUTPUT); // Sets the trigPin as an Output
+  pinMode(echoPin, INPUT); // Sets the echoPin as an Input
+  Serial.begin(9600); // Starts the serial communication
 }
 
 void loop()
