@@ -19,6 +19,9 @@
 #include "esp32-hal-ledc.h"
 #include "sdkconfig.h"
 #include "camera_index.h"
+
+// Define camera model before including camera_pins.h
+#define CAMERA_MODEL_AI_THINKER // Has PSRAM
 #include "camera_pins.h"
 
 #if defined(ARDUINO_ARCH_ESP32) && defined(CONFIG_ARDUHAL_ESP_LOG)
