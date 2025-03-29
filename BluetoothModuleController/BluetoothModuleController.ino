@@ -1,29 +1,41 @@
+/*
+ * HC-05 AT Mode
+ * 
+ * To enter the AT Mode of Bluetooth HC-05 
+ * 
+ * Please make sure that the button on the bluetooth HC-05 is pressed
+ * before supply a power to it. You'll notice that the LED on the 
+ * bluetooth HC-05 will blink slower than the normal mode. Then release
+ * the button.
+ * Open the Serial monitor and set the baud rate to 9600 and Both NL and CR.
+ * 
+ * AT+NAME=....   -> To set the bluetooth name. Example: AT+NAME=CYTRON
+ * AT+PSWD="...." -> To set the bluetooth password. Example: AT+PSWD="0000"
+ * 
+ * For more info: https://docs.google.com/…/1JGKLEX0Jm_0jvSgEAjsCdnhwIo1…/view
+ * 
+ * 7th January 2019
+ * by Suad Anwar
+ * 
+ */
 #include <SoftwareSerial.h>
 
-//Create software serial object to communicate with HC-05
-SoftwareSerial mySerial(3, 2); //HC-05 Tx & Rx is connected to Arduino #3 & #2
+SoftwareSerial BTSerial(2, 3); // RX | TX
 
 void setup()
 {
-  //Begin serial communication with Arduino and Arduino IDE (Serial Monitor)
   Serial.begin(9600);
-  
-  //Begin serial communication with Arduino and HC-05
-  mySerial.begin(9600);
-
-  Serial.println("Initializing...");
-  Serial.println("The device started, now you can pair it with bluetooth!");
+  Serial.println("Enter AT commands:");
+  BTSerial.begin(38400);       // HC-05 default speed in AT command more
 }
 
 void loop()
 {
-  if(Serial.available()) 
-  {
-    mySerial.write(Serial.read());//Forward what Serial received to Software Serial Port
+  if (BTSerial.available()) {   // read from HC-05 and send to Arduino Serial Monitor
+    Serial.write(BTSerial.read());
   }
-  if(mySerial.available()) 
-  {
-    Serial.write(mySerial.read());//Forward what Software Serial received to Serial Port
+
+  if (Serial.available()) {    // Keep reading from Arduino Serial Monitor and send to HC-05
+    BTSerial.write(Serial.read());
   }
-  delay(20);
 }
