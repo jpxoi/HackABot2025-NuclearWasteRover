@@ -120,6 +120,40 @@ void loop()
       Stop();
     }
   }
+  
+  // Measure distance
+  distance = getDistance();
+  Serial.print("Distance: ");
+  Serial.print(distance);
+  Serial.println(" cm");
+
+  // Send appropriate signals based on distance
+  if (distance <= level1 && distance > level2) {
+    Serial.println("BEEP_SLOW");  // Slow beeps
+  } 
+  else if (distance <= level2 && distance > level3) {
+    Serial.println("BEEP_MEDIUM");  // Medium beeps
+  } 
+  else if (distance <= level3 && distance > minDistance) {
+    Serial.println("BEEP_FAST");  // Fast beeps
+  } 
+  else if (distance <= minDistance) {
+    Serial.println("CONTINUOUS_BEEP");  // Continuous beep
+  }
+
+  delay(100);  // Small delay for stability
+}
+
+int getDistance() {
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+
+  duration = pulseIn(echoPin, HIGH);
+  int distance = duration * 0.034 / 2;  // Calculate distance in cm
+  return distance;
 }
 
 void forward()
