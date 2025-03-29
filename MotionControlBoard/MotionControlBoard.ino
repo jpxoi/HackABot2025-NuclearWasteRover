@@ -11,6 +11,17 @@ AF_DCMotor motor4(4);
 Servo servo1;
 Servo servo2;
 
+const int trigPin = 12;
+const int echoPin = 11;
+
+const int level1 = 10;  // Farther distance
+const int level2 = 5;  // Medium distance
+const int level3 = 3;  // Closer distance
+const int minDistance = 2;  // Very close, continuous beep
+
+long duration;
+int distance;
+
 void setup()
 {
   Serial.begin(9600);
