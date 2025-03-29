@@ -1,6 +1,14 @@
 #include "esp_camera.h"
 #include <WiFi.h>
 
+#include "BluetoothSerial.h"
+#if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
+#error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
+#endif
+BluetoothSerial SerialBT;
+int incoming;
+#define LED_BUILTIN 4 // GPIO 4 is the built-in LED on the ESP32-CAM board
+
 //
 // WARNING!!! PSRAM IC required for UXGA resolution and high JPEG quality
 //            Ensure ESP32 Wrover Module or other board with PSRAM is selected
@@ -160,6 +168,26 @@ void setup() {
 }
 
 void loop() {
+    // put your main code here, to run repeatedly:
+    if (SerialBT.available()) //Check if we receive anything from Bluetooth
+    {
+      incoming = SerialBT.read(); //Read what we recevive 
+      Serial.print("Received:"); 
+      Serial.println(incoming);
+  
+      if (incoming == 49)
+          {
+          digitalWrite(LED_BUILTIN, HIGH);
+          SerialBT.println("LED turned ON");
+          }
+          
+      if (incoming == 48)
+          {
+          digitalWrite(LED_BUILTIN, LOW);
+          SerialBT.println("LED turned OFF");
+          }     
+    }
+    delay(20);
   // Do nothing. Everything is done in another task by the web server
-  delay(10000);
+  // delay(10000);
 }
