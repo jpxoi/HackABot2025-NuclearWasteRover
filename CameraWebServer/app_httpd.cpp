@@ -30,8 +30,9 @@
 // LED FLASH setup
 #if CONFIG_LED_ILLUMINATOR_ENABLED
 
-#define LED_LEDC_GPIO            22  //configure LED pin
+#define LED_LEDC_GPIO            LED_GPIO_NUM  //use LED pin defined in camera_pins.h
 #define CONFIG_LED_MAX_INTENSITY 255
+#define LED_LEDC_CHANNEL         8  // Use channel 8 for LED control
 
 int led_duty = 0;
 bool isStreaming = false;
@@ -97,10 +98,36 @@ void enable_led(bool en) {  // Turn LED On or Off
   if (en && isStreaming && (led_duty > CONFIG_LED_MAX_INTENSITY)) {
     duty = CONFIG_LED_MAX_INTENSITY;
   }
-  ledcWrite(LED_LEDC_GPIO, duty);
-  //ledc_set_duty(CONFIG_LED_LEDC_SPEED_MODE, CONFIG_LED_LEDC_CHANNEL, duty);
-  //ledc_update_duty(CONFIG_LED_LEDC_SPEED_MODE, CONFIG_LED_LEDC_CHANNEL);
+  ledcWrite(LED_LEDC_CHANNEL, duty);
   log_i("Set LED intensity to %d", duty);
+}
+
+// New handler function for direct LED control
+static esp_err_t led_handler(httpd_req_t *req) {
+  char *buf = NULL;
+  char _led[32];
+
+  if (parse_get(req, &buf) != ESP_OK) {
+    return ESP_FAIL;
+  }
+  if (httpd_query_key_value(buf, "led", _led, sizeof(_led)) != ESP_OK) {
+    free(buf);
+    httpd_resp_send_404(req);
+    return ESP_FAIL;
+  }
+  free(buf);
+
+  int val = atoi(_led);
+  log_i("Set LED: %d", val);
+  
+  if (val == 1) {
+    enable_led(true);
+  } else {
+    enable_led(false);
+  }
+
+  httpd_resp_set_hdr(req, "Access-Control-Allow-Origin", "*");
+  return httpd_resp_send(req, NULL, 0);
 }
 #endif
 
@@ -817,6 +844,22 @@ void startCameraServer() {
 #endif
   };
 
+#if CONFIG_LED_ILLUMINATOR_ENABLED
+  // LED control URI
+  httpd_uri_t led_uri = {
+    .uri = "/led",
+    .method = HTTP_GET,
+    .handler = led_handler,
+    .user_ctx = NULL
+#ifdef CONFIG_HTTPD_WS_SUPPORT
+    ,
+    .is_websocket = true,
+    .handle_ws_control_frames = false,
+    .supported_subprotocol = NULL
+#endif
+  };
+#endif
+
   ra_filter_init(&ra_filter, 20);
 
   log_i("Starting web server on port: '%d'", config.server_port);
@@ -832,6 +875,9 @@ void startCameraServer() {
     httpd_register_uri_handler(camera_httpd, &greg_uri);
     httpd_register_uri_handler(camera_httpd, &pll_uri);
     httpd_register_uri_handler(camera_httpd, &win_uri);
+#if CONFIG_LED_ILLUMINATOR_ENABLED
+    httpd_register_uri_handler(camera_httpd, &led_uri);
+#endif
   }
 
   config.server_port += 1;
@@ -844,7 +890,8 @@ void startCameraServer() {
 
 void setupLedFlash(int pin) {
 #if CONFIG_LED_ILLUMINATOR_ENABLED
-  ledcAttach(pin, 5000, 8);
+  ledcSetup(8, 5000, 8); // Channel 8, 5000Hz, 8-bit resolution
+  ledcAttachPin(pin, 8); // Attach pin to channel 8
 #else
   log_i("LED flash is disabled -> CONFIG_LED_ILLUMINATOR_ENABLED = 0");
 #endif
