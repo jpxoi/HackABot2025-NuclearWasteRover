@@ -1,14 +1,6 @@
 #include "esp_camera.h"
 #include <WiFi.h>
 
-#include "BluetoothSerial.h"
-#if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
-#error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
-#endif
-BluetoothSerial SerialBT;
-int incoming;
-#define LED_BUILTIN 4 // GPIO 4 is the built-in LED on the ESP32-CAM board
-
 //
 // WARNING!!! PSRAM IC required for UXGA resolution and high JPEG quality
 //            Ensure ESP32 Wrover Module or other board with PSRAM is selected
@@ -54,6 +46,11 @@ void setup() {
   Serial.begin(115200);
   Serial.setDebugOutput(true);
   Serial.println();
+  SerialBT.begin("SpikeyVision"); //Bluetooth device name
+  Serial.println("The device started, now you can pair it");
+  Serial.setDebugOutput(true);
+  Serial.println();
+  pinMode (LED_BUILTIN, OUTPUT);//Specify that LED pin is output
 
   camera_config_t config;
   config.ledc_channel = LEDC_CHANNEL_0;
