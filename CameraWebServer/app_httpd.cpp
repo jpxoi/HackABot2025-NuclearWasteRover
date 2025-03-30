@@ -34,6 +34,7 @@
 // LED FLASH setup
 #if CONFIG_LED_ILLUMINATOR_ENABLED
 
+//#define LED_LEDC_GPIO            4 // configure led pin
 #define CONFIG_LED_MAX_INTENSITY 255
 #define LED_LEDC_CHANNEL         8  // Use channel 8 for LED control
 
@@ -899,6 +900,7 @@ void setupLedFlash(int pin) {
 #if CONFIG_LED_ILLUMINATOR_ENABLED
   ledcAttach(pin, 5000, LED_LEDC_CHANNEL); // Attach pin to LED_LEDC_CHANNEL
   led_gpio = pin;  // Store the pin for later use
+  log_i("LED flash is enabled -> CONFIG_LED_ILLUMINATOR_ENABLED = 1");
 #else
   log_i("LED flash is disabled -> CONFIG_LED_ILLUMINATOR_ENABLED = 0");
 #endif
