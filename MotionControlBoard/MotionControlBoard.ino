@@ -8,25 +8,22 @@ AF_DCMotor motor2(2);
 AF_DCMotor motor3(3);
 AF_DCMotor motor4(4);
 
-Servo servo1;
-Servo servo2;
+Servo servo1; // Camera servo (up/down)
+Servo servo2; // Arm servo (open/close)
 
 const int trigPin = 12;
 const int echoPin = 11;
 
-const int level1 = 10;  // Farther distance
-const int level2 = 5;  // Medium distance
-const int level3 = 3;  // Closer distance
-const int minDistance = 2;  // Very close, continuous beep
+const int level1 = 20;  // Farther distance
+const int level2 = 10;  // Medium distance
+const int level3 = 5;  // Closer distance
+const int minDistance = 3;  // Very close, continuous beep
 
 long duration;
 int distance;
 
 void setup()
 {
-  Serial.begin(9600);
-
-  // Set the speed of all motors
   motor1.setSpeed(Speed);
   motor2.setSpeed(Speed);
   motor3.setSpeed(Speed);
@@ -38,11 +35,12 @@ void setup()
 
   // Set initial positions of servos
   servo1.write(180);
-  servo2.write(180);
+  servo2.write(120);
 
   // Set Ultrasonic Sensor
   pinMode(trigPin, OUTPUT); // Sets the trigPin as an Output
   pinMode(echoPin, INPUT); // Sets the echoPin as an Input
+
   Serial.begin(9600); // Starts the serial communication
 }
 
@@ -54,73 +52,44 @@ void loop()
     Serial.println(value);
 
     // Control servos based on received value
-    if (value == '1')
-    {
-      servo1.write(70);
-      servo2.write(180 - 70);
-    }
-    else if (value == '2')
-    {
-      servo1.write(80);
-      servo2.write(180 - 80);
-    }
-    else if (value == '3')
-    {
-      servo1.write(90);
-      servo2.write(180 - 90);
-    }
-    else if (value == '4')
-    {
-      servo1.write(100);
-      servo2.write(180 - 100);
-    }
-    else if (value == '5')
-    {
-      servo1.write(120);
-      servo2.write(180 - 120);
-    }
-    else if (value == '6')
-    {
-      servo1.write(140);
-      servo2.write(180 - 140);
-    }
-    else if (value == '7')
-    {
+    if (value == 'U') { // Camera Up
       servo1.write(150);
-      servo2.write(180 - 150);
     }
-    else if (value == '8')
-    {
-      servo1.write(160);
-      servo2.write(180 - 160);
+    else if (value == 'D') { // Camera Down
+      servo1.write(90);
     }
-    else if (value == '9')
-    {
-      servo1.write(170);
-      servo2.write(180 - 170);
+    else if (value == 'C') { // Camera Center
+      servo1.write(120);
     }
-    else if (value == 'F')
-    {
+    else if (value == 'O') { // Open hand
+      servo2.write(180);
+    }
+    else if (value == 'H') { // Close hand (half)
+      servo2.write(120);
+    }
+    else if (value == 'G') { // Close hand fully (grab)
+      servo2.write(60);
+    }
+    else if (value == 'F') { // Forward
       forward();
     }
-    else if (value == 'B')
-    {
+    else if (value == 'B') { // Backward
       backward();
     }
-    else if (value == 'L')
-    {
+    else if (value == 'L') { // Left
       left();
     }
-    else if (value == 'R')
-    {
+    else if (value == 'R') { // Right
       right();
     }
-    else
-    {
+    else if (value == 'S') { // Stop
+      Stop();
+    }
+    else { // Default - stop movement
       Stop();
     }
   }
-  
+
   // Measure distance
   distance = getDistance();
   Serial.print("Distance: ");
@@ -160,8 +129,8 @@ void forward()
 {
   // Move motors to drive forward
   motor1.run(FORWARD);
-  motor2.run(BACKWARD);
-  motor3.run(BACKWARD);
+  motor2.run(FORWARD);
+  motor3.run(FORWARD);
   motor4.run(FORWARD);
 }
 
@@ -169,8 +138,8 @@ void backward()
 {
   // Move motors to drive backward
   motor1.run(BACKWARD);
-  motor2.run(FORWARD);
-  motor3.run(FORWARD);
+  motor2.run(BACKWARD);
+  motor3.run(BACKWARD);
   motor4.run(BACKWARD);
 }
 
@@ -178,8 +147,8 @@ void left()
 {
   // Move motors to turn left
   motor1.run(FORWARD);
-  motor2.run(FORWARD);
-  motor3.run(BACKWARD);
+  motor2.run(BACKWARD);
+  motor3.run(FORWARD);
   motor4.run(BACKWARD);
 }
 
@@ -187,8 +156,8 @@ void right()
 {
   // Move motors to turn right
   motor1.run(BACKWARD);
-  motor2.run(BACKWARD);
-  motor3.run(FORWARD);
+  motor2.run(FORWARD);
+  motor3.run(BACKWARD);
   motor4.run(FORWARD);
 }
 

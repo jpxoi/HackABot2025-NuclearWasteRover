@@ -7,7 +7,8 @@ import platform
 # Set correct port name (check Arduino IDE for correct port)
 # port_name = "COM3"  # For Windows (e.g., COM3)
 # port_name = "/dev/ttyUSB0"  # For Linux
-port_name = "/dev/tty.usbserial-1140"  # For Mac
+# port_name = "/dev/tty.usbserial-140"  # For Mac
+port_name = "/dev/tty.SpikeyController"  # For Mac
 
 # Set up serial communication
 ser = serial.Serial(port_name, 9600, timeout=1)
