@@ -24,9 +24,6 @@ int distance;
 
 void setup()
 {
-  Serial.begin(9600);
-
-  // Set the speed of all motors
   motor1.setSpeed(Speed);
   motor2.setSpeed(Speed);
   motor3.setSpeed(Speed);
@@ -38,11 +35,12 @@ void setup()
 
   // Set initial positions of servos
   servo1.write(180);
-  servo2.write(180);
+  servo2.write(120);
 
   // Set Ultrasonic Sensor
   pinMode(trigPin, OUTPUT); // Sets the trigPin as an Output
   pinMode(echoPin, INPUT); // Sets the echoPin as an Input
+
   Serial.begin(9600); // Starts the serial communication
 }
 
@@ -54,50 +52,44 @@ void loop()
     Serial.println(value);
 
     // Control servos based on received value
-    switch(value) {
-      // Camera servo control (up/down movement)
-      case 'U': // Camera Up
-        servo1.write(150);
-        break;
-      case 'D': // Camera Down
-        servo1.write(90);
-        break;
-      case 'C': // Camera Center
-        servo1.write(120);
-        break;
-        
-      // Arm servo control (open/close hand)
-      case 'O': // Open hand
-        servo2.write(180);
-        break;
-      case 'H': // Close hand (half)
-        servo2.write(120);
-        break;
-      case 'G': // Close hand fully (grab)
-        servo2.write(60);
-        break;
-      
-      // Movement controls
-      case 'F':
-        forward();
-        break;
-      case 'B':
-        backward(); 
-        break;
-      case 'L':
-        left();
-        break;
-      case 'R':
-        right();
-        break;
-      
-      // Default case - stop movement
-      default:
-        Stop();
-        break;
+    if (value == 'U') { // Camera Up
+      servo1.write(150);
+    }
+    else if (value == 'D') { // Camera Down
+      servo1.write(90);
+    }
+    else if (value == 'C') { // Camera Center
+      servo1.write(120);
+    }
+    else if (value == 'O') { // Open hand
+      servo2.write(180);
+    }
+    else if (value == 'H') { // Close hand (half)
+      servo2.write(120);
+    }
+    else if (value == 'G') { // Close hand fully (grab)
+      servo2.write(60);
+    }
+    else if (value == 'F') { // Forward
+      forward();
+    }
+    else if (value == 'B') { // Backward
+      backward();
+    }
+    else if (value == 'L') { // Left
+      left();
+    }
+    else if (value == 'R') { // Right
+      right();
+    }
+    else if (value == 'S') { // Stop
+      Stop();
+    }
+    else { // Default - stop movement
+      Stop();
     }
   }
-  
+
   // Measure distance
   distance = getDistance();
   Serial.print("Distance: ");
@@ -137,8 +129,8 @@ void forward()
 {
   // Move motors to drive forward
   motor1.run(FORWARD);
-  motor2.run(BACKWARD);
-  motor3.run(BACKWARD);
+  motor2.run(FORWARD);
+  motor3.run(FORWARD);
   motor4.run(FORWARD);
 }
 
@@ -146,8 +138,8 @@ void backward()
 {
   // Move motors to drive backward
   motor1.run(BACKWARD);
-  motor2.run(FORWARD);
-  motor3.run(FORWARD);
+  motor2.run(BACKWARD);
+  motor3.run(BACKWARD);
   motor4.run(BACKWARD);
 }
 
@@ -155,8 +147,8 @@ void left()
 {
   // Move motors to turn left
   motor1.run(FORWARD);
-  motor2.run(FORWARD);
-  motor3.run(BACKWARD);
+  motor2.run(BACKWARD);
+  motor3.run(FORWARD);
   motor4.run(BACKWARD);
 }
 
@@ -164,8 +156,8 @@ void right()
 {
   // Move motors to turn right
   motor1.run(BACKWARD);
-  motor2.run(BACKWARD);
-  motor3.run(FORWARD);
+  motor2.run(FORWARD);
+  motor3.run(BACKWARD);
   motor4.run(FORWARD);
 }
 
